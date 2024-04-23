@@ -72,7 +72,7 @@
         android:layout_gravity="center"
         android:background="@drawable/btn_custom"
         android:text="Report"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:layout_marginTop="20dp"/>
 
 </LinearLayout>

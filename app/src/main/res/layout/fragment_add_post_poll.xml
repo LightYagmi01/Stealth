@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
             <EditText
                 android:id="@+id/edtPost"
                 android:layout_width="match_parent"
@@ -25,7 +25,7 @@
                 android:padding="10dp"
                 android:background="@drawable/edittext_box"
                 android:maxLength="500"
-                android:maxLines="10"
+                android:maxLines="3"
                 android:inputType="textMultiLine"/>
 
             <Button
@@ -49,7 +49,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="visible">
+            android:visibility="gone">
             <EditText
                 android:id="@+id/edtTitle"
                 android:layout_width="match_parent"

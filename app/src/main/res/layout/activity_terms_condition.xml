@@ -21,7 +21,7 @@
             android:id="@+id/textViewEffectiveDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Effective Date: [Insert Today's Date]"
+            android:text="Effective Date: 22-Apr-24"
             android:textSize="16sp"
             android:textStyle="italic"
             android:layout_marginTop="8dp" />
@@ -39,7 +39,7 @@
             android:id="@+id/textViewTerms"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text='These terms and conditions (\"Terms\") govern your use of the Stealth mobile application (\"App\") developed by WraithCoders (\"we,\" \"us,\" or \"our\"). By accessing or using the App in India, you agree to be bound by these Terms and the laws of India, including:\n- The Information Technology Act, 2000 (including amendments)\n- The Indian Penal Code, 1860\n- The Digital Personal Data Protection Act, 2023 (DPD Act) (once notified)'
+            android:text='These terms and conditions (\"Terms\") govern your use of the Stealth mobile application (\"App\") developed by WraithCoders (\"we,\" \"us,\" or \"our\"). By accessing or using the App in India, you agree to be bound by these Terms and the laws of India, including:\n- The Information Technology Act, 2000 (including amendments)\n- The Indian Penal Code, 1860'
             android:textSize="16sp"
             android:layout_marginTop="8dp" />
 

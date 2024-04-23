@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class MyPollFragment extends BackendCommon {
+public class MyPollFragment extends Fragment {
     TextView txtNoPoll;
     public MyPollFragment() {
         // Required empty public constructor
@@ -25,9 +25,10 @@ public class MyPollFragment extends BackendCommon {
         RecyclerView recyclerView;
         recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        RecyclerPollAdapter adapter = new RecyclerPollAdapter(getActivity(), BackendCommon.pollManager.Polls);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        RecyclerPollAdapter adapter = new RecyclerPollAdapter(getActivity(), BackendCommon.myPoll.Polls,RecyclerPollOptionsAdapter.PersonalPoll);
         recyclerView.setAdapter(adapter);
+        BackendCommon.myPoll.adapter=adapter;
         if (adapter.getItemCount() == 0) {
             txtNoPoll.setVisibility(View.VISIBLE);
         } else {

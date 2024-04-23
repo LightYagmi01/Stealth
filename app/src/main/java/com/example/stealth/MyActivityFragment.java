@@ -28,14 +28,12 @@ public class MyActivityFragment extends Fragment {
         VPAdapter adapter = new VPAdapter(this);
         viewPager.setAdapter(adapter);
         TabLayout tabLayout = rootView.findViewById(R.id.tabLayout);
-
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> {
-            Fragment selectedFragment = null;
                     if (position == 0) {
-                        selectedFragment = new MyPostFragment();
+                        tab.setText("My Posts");
                     } else if (position == 1) {
-                        selectedFragment = new MyPollFragment();
+                        tab.setText("My poll");
                     }
                 }).attach();
         return rootView;

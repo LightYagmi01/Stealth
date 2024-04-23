@@ -15,16 +15,17 @@
             android:layout_width="wrap_content"
             android:layout_height="99dp"
             android:src="@drawable/stealth" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Welcome to STEALTH, an innovative anonymous posting application designed to create a safe and secure environment.\n\nFounded by a team of four passionate individuals, WraithCoders envisioned a platform where individuals could freely express themselves without fear of judgment or repercussion.\n\nMeet our dedicated team:\nAbhay Sachan\nAjitesh Singh\nSahil Kumar Singh\nAkshaibala Sreenianbarasan\n\nThanks for joining us in embracing the power of anonymity to break down barriers, build meaningful connections, and engage in conversations that matter."
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:lineSpacingMultiplier="1.2"
-                android:padding="16dp"
-                android:elevation="4dp"
-                />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="4dp"
+            android:lineSpacingMultiplier="1.2"
+            android:padding="16dp"
+            android:text="Welcome to STEALTH, an innovative anonymous posting application designed to create a safe and secure environment.\n\nMeet our dedicated team:\nAbhay Sachan\nAjitesh Singh\nSahil Kumar Singh\nAkshaibala Sreenianbarasan\n\nThanks for joining us in embracing the power of anonymity to break down barriers, build meaningful connections, and engage in conversations that matter."
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

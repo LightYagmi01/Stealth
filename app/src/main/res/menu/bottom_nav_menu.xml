@@ -15,5 +15,5 @@
         android:icon="@drawable/my_post"/>
     <item android:title="Stealth"
         android:id="@+id/menuAbout"
-        android:icon="@drawable/ic_launcher_round"/>
+        android:icon="@drawable/logonontransparent"/>
 </menu>

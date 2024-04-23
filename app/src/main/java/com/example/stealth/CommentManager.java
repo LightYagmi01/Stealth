@@ -1,7 +1,5 @@
 package com.example.stealth;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
@@ -13,7 +11,6 @@ import java.util.ArrayList;
 
 public class CommentManager extends DatabaseManager implements Serializable {
     String ParentKey;
-    final int MaxReport=10;
     String UserId;
     ArrayList<CommentInfo> Comments;
     RecyclerCommentAdapter adapter;
@@ -97,7 +94,6 @@ public class CommentManager extends DatabaseManager implements Serializable {
     }
     public boolean OnCompleteCommentRead()
     {
-//        Log.i("Adapter",adapter.toString());
         if(adapter!=null)adapter.notifyDataSetChanged();
         return true;
     }
@@ -193,7 +189,7 @@ public class CommentManager extends DatabaseManager implements Serializable {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}});
     }
-    public void ReportComment(String CommentId)
+    public void IncreaseReport(String CommentId)
     {
         Comment.child(ParentKey).child(CommentId).child("Report").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -207,6 +203,31 @@ public class CommentManager extends DatabaseManager implements Serializable {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}});
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
+    public void ReportComment(String CommentId)
+    {
+        ReportCount.child("Comment").child(CommentId).child(UserId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists())return;
+                else
+                {
+                    IncreaseReport(CommentId);
+
+                    ReportCount.child("Comment").child(CommentId).child(UserId).setValue(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
 }

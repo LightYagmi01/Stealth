@@ -20,9 +20,9 @@
                 android:id="@+id/txtTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
+                android:padding="10dp"
                 android:textStyle="bold"
-                android:textSize="30sp"
+                android:textSize="20sp"
                 android:textColor="@color/white"/>
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/options_recycler_view"

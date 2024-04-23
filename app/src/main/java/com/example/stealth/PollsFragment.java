@@ -20,19 +20,21 @@ public class PollsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View rootView = inflater.inflate(R.layout.fragment_polls, container, false);
         txtNoPoll = rootView.findViewById(R.id.txtNoPoll);
+//        BackendCommon.pollManager=new PollManager(BackendCommon.UserId);
         RecyclerView recyclerView;
         recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        RecyclerPollAdapter adapter = new RecyclerPollAdapter(getActivity(), BackendCommon.pollManager.Polls);
+        RecyclerPollAdapter adapter = new RecyclerPollAdapter(getActivity(), BackendCommon.pollManager.Polls,RecyclerPollOptionsAdapter.GeneralPoll);
         recyclerView.setAdapter(adapter);
         BackendCommon.pollManager.adapter=adapter;
-        if (adapter.getItemCount() == 0) {
-            txtNoPoll.setVisibility(View.VISIBLE);
-        } else {
-            txtNoPoll.setVisibility(View.GONE);
-        }
+//        if (adapter.getItemCount() == 0) {
+//            txtNoPoll.setVisibility(View.VISIBLE);
+//        } else {
+//            txtNoPoll.setVisibility(View.GONE);
+//        }
         return rootView;
     }
 }

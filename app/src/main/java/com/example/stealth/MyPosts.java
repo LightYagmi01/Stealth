@@ -1,6 +1,5 @@
 package com.example.stealth;
 
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -11,22 +10,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class MyPosts extends PostsManager{
-    RecyclerMyPostAdapter adapter;
     MyPosts(String user)
     {
         super(user);
 //        Out("We reach here");
 
-    }
-    @Override
-    public void OnCompletePostRead()
-    {
-
-        if(adapter!=null) {
-            Log.i("Function","Called");
-            adapter.notifyDataSetChanged();
-        }
-//        this.UpVote(Posts.get(0));
     }
     @Override
     public void addListenerforHead()
@@ -52,8 +40,8 @@ public class MyPosts extends PostsManager{
                         pinfo.Key=key;
 //                        pinfo.commentManager=new CommentManager(key);
                         pinfo.UserId=snapshot.child("User").getValue(String.class);
-                        pinfo.DownVote=snapshot.child("DownVote").getValue(long.class);
-                        pinfo.UpVote=snapshot.child("UpVote").getValue(long.class);
+                        pinfo.DownVote=snapshot.child("Vote").child("DownVote").getValue(long.class);
+                        pinfo.UpVote=snapshot.child("Vote").child("UpVote").getValue(long.class);
                         Posts.add(0,pinfo);
                         Vote.child(key).child(UserId).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -93,8 +81,8 @@ public class MyPosts extends PostsManager{
 //                pinfo.commentManager = new CommentManager(PostKey);
 //                PostKey=snapshot.child("Next").getValue(String.class);
                 pinfo.UserId=snapshot.child("User").getValue(String.class);
-                pinfo.DownVote=snapshot.child("DownVote").getValue(long.class);
-                pinfo.UpVote=snapshot.child("UpVote").getValue(long.class);
+                pinfo.DownVote=snapshot.child("Vote").child("DownVote").getValue(long.class);
+                pinfo.UpVote=snapshot.child("Vote").child("UpVote").getValue(long.class);
 //                Out("We reach here");
                 Vote.child(pinfo.Key).child(UserId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

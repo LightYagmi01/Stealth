@@ -1,29 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- The first layer: a rectangle with a light grey (#E0E0E0) stroke -->
+    <item android:id="@+id/border">
         <shape android:shape="rectangle">
             <size android:height="40dp"/>
             <corners android:radius="4dp"/>
-            <stroke android:color="#E0E0E0"
-                android:width="1dp"/>
+            <stroke android:color="@color/white" android:width="1dp"/>
         </shape>
     </item>
 
+    <!-- The second layer: a rectangle that scales with the SeekBar's progress -->
     <item>
-        <scale android:scaleWidth="100%0">
+        <scale android:scaleWidth="100%">
             <selector>
-                <item android:state_enabled="false"
-                    android:drawable="@android:color/transparent"/>
+                <!-- When the SeekBar is disabled, this layer is transparent -->
+                <item android:state_enabled="false" android:drawable="@android:color/transparent"/>
+                <!-- Otherwise, this layer is a slightly darker grey (#DDDDDD) rectangle with a light grey (#E0E0E0) stroke -->
                 <item>
                     <shape android:shape="rectangle">
-                        <solid android:color="#DDDDDD"/>
+                        <solid android:color="#333333"/>
                         <size android:height="40dp"/>
-                        <corners android:bottomLeftRadius="4dp"
-                            android:topLeftRadius="4dp"/>
-                        <stroke android:color="#E0E0E0"
-                            android:width="1dp"/>
+                        <corners android:bottomLeftRadius="4dp" android:topLeftRadius="4dp"
+                            android:bottomRightRadius="4dp"
+                            android:topRightRadius="4dp"/>
                     </shape>
                 </item>
             </selector>

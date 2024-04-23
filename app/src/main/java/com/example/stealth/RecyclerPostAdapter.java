@@ -7,7 +7,6 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,10 +28,17 @@ import android.widget.Toast;
 public class RecyclerPostAdapter extends RecyclerView.Adapter<RecyclerPostAdapter.ViewHolder> {
     Context context;
     ArrayList<PostInfo> arrPosts;
+    PostsManager postsManager;
+    int PostType;
+    static final int GeneralPost=0;
+    static final int PersonalPost=1;
+    int working=0;// allowing one click listener to be active at a time
 
-    RecyclerPostAdapter(Context context, ArrayList<PostInfo> arrPosts) {
+    RecyclerPostAdapter(Context context, ArrayList<PostInfo> arrPosts,PostsManager postsManager,int PostType) {
         this.context = context;
         this.arrPosts = arrPosts;
+        this.postsManager=postsManager;
+        this.PostType=PostType;
     }
 
     @NonNull
@@ -62,9 +68,9 @@ public class RecyclerPostAdapter extends RecyclerView.Adapter<RecyclerPostAdapte
             holder.txtUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_upward, 0, 0, 0);
         }
         if (position == getItemCount() - 3) {
-            if(BackendCommon.postsManager.PostKey==null)
-                Toast.makeText(context, "Reach End"+BackendCommon.postsManager.PostKey, Toast.LENGTH_SHORT).show();
-            BackendCommon.postsManager.RetrieveNPost(5);
+//            if(postsManager.PostKey==null)
+//                Toast.makeText(context, "Reach End", Toast.LENGTH_SHORT).show();
+            postsManager.RetrieveNPost(5);
         }
 
 
@@ -97,7 +103,7 @@ public class RecyclerPostAdapter extends RecyclerView.Adapter<RecyclerPostAdapte
                                     String text = editText.getText().toString();
                                     if(text.isEmpty() || radioGroup.getCheckedRadioButtonId() == -1)
                                         return;
-                                    BackendCommon.postsManager.ReportPost(arrPosts.get(position).Key);
+                                    postsManager.ReportPost(arrPosts.get(position));
                                     Toast.makeText(context, "Report Sent", Toast.LENGTH_SHORT).show();
                                     alertDialog.dismiss();
                                 }
@@ -119,56 +125,13 @@ public class RecyclerPostAdapter extends RecyclerView.Adapter<RecyclerPostAdapte
         holder.txtUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(arrPosts.get(position).VoteType == 1)
-                {
-                    holder.txtUp.setText(String.valueOf(--arrPosts.get(position).UpVote));
-                    arrPosts.get(position).VoteType = 0;
-                    holder.txtUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_upward, 0, 0, 0);
-                }
-                else if(arrPosts.get(position).VoteType == -1)
-                {
-                    holder.txtUp.setText(String.valueOf(++arrPosts.get(position).UpVote));
-                    holder.txtDown.setText(String.valueOf(--arrPosts.get(position).DownVote));
-                    arrPosts.get(position).VoteType = 1;
-                    holder.txtUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_upward_filled, 0, 0, 0);
-                    holder.txtDown.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_downward, 0, 0, 0);
-                }
-                else
-                {
-                    holder.txtUp.setText(String.valueOf(++arrPosts.get(position).UpVote));
-                    arrPosts.get(position).VoteType=1;
-                    holder.txtUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_upward_filled, 0, 0, 0);
-                }
-
-                BackendCommon.postsManager.UpVote(arrPosts.get(position));
+                postsManager.UpVote(arrPosts.get(position));
             }
         });
         holder.txtDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)  {
-
-                if(arrPosts.get(position).VoteType == -1)
-                {
-                    holder.txtDown.setText(String.valueOf(--arrPosts.get(position).DownVote));
-                    arrPosts.get(position).VoteType=0;
-                    holder.txtDown.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_downward, 0, 0, 0);
-                }
-                else if(arrPosts.get(position).VoteType == 1)
-                {
-                    holder.txtDown.setText(String.valueOf(++arrPosts.get(position).DownVote));
-                    holder.txtUp.setText(String.valueOf(--arrPosts.get(position).UpVote));
-                    arrPosts.get(position).VoteType=-1;
-                    holder.txtUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_upward, 0, 0, 0);
-                    holder.txtDown.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_downward_filled, 0, 0, 0);
-                }
-                else
-                {
-                    holder.txtDown.setText(String.valueOf(++arrPosts.get(position).DownVote));
-                    arrPosts.get(position).VoteType = -1;
-                    holder.txtDown.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_downward_filled, 0, 0, 0);
-                }
-
-                BackendCommon.postsManager.DownVote(arrPosts.get(position));
+                postsManager.DownVote(arrPosts.get(position));
             }
         });
         holder.post.setOnClickListener(new View.OnClickListener() {
@@ -177,12 +140,8 @@ public class RecyclerPostAdapter extends RecyclerView.Adapter<RecyclerPostAdapte
                 PostInfo clickedPost = arrPosts.get(position);
 
                 Intent intent = new Intent(context, PostDetailsActivity.class);
-
-                intent.putExtra("postText", clickedPost.Info);
-                intent.putExtra("upVote", clickedPost.UpVote+"");
-                intent.putExtra("downVote", clickedPost.DownVote+"");
-                intent.putExtra("Key", clickedPost.Key);
-                intent.putExtra("VoteType", clickedPost.VoteType+"");
+                intent.putExtra("position", position);
+                intent.putExtra("PostType",PostType);
                 context.startActivity(intent);
             }
         });

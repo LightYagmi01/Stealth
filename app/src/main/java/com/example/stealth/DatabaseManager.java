@@ -22,7 +22,7 @@ public class DatabaseManager {
     static DatabaseReference Poll = dr.child("Poll");
     static DatabaseReference PollVote = dr.child("PollVote");
     static DatabaseReference ReportCount = dr.child("ReportCount");
-    static TextView textView;
+    static final int MaxReport=3;
 //    static public void Out(String s)
 //    {textView.setText(textView.getText()+s+"\n");}
 

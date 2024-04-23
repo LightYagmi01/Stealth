@@ -1,6 +1,5 @@
 package com.example.stealth;
 
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -10,6 +9,8 @@ import androidx.annotation.RestrictTo;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -18,10 +19,9 @@ public class PostsManager extends DatabaseManager{
     String PostKey;
     int PostToRead;
     String UserId;
-    static final long MaxReport=10;
-    static final long NoOfPost=10;
     ArrayList<PostInfo> Posts;
     RecyclerPostAdapter adapter;
+    PostDetailsActivity DetailsRef;
     public void addListenerforHead()
     {
         Post.child("Head").addValueEventListener(new ValueEventListener() {
@@ -44,8 +44,8 @@ public class PostsManager extends DatabaseManager{
                         pinfo.Key=key;
 //                        pinfo.commentManager=new CommentManager(key);
                         pinfo.UserId=snapshot.child("User").getValue(String.class);
-                        pinfo.DownVote=snapshot.child("DownVote").getValue(long.class);
-                        pinfo.UpVote=snapshot.child("UpVote").getValue(long.class);
+                        pinfo.DownVote=snapshot.child("Vote").child("DownVote").getValue(long.class);
+                        pinfo.UpVote=snapshot.child("Vote").child("UpVote").getValue(long.class);
                         pinfo.VoteType=0;
                         Posts.add(0,pinfo);
                         Vote.child(key).child(UserId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -104,15 +104,25 @@ public class PostsManager extends DatabaseManager{
     }
     public void OnCompletePostRead()
     {
-
-        if(adapter!=null) {
-            Log.i("Function","Called");
-            adapter.notifyDataSetChanged();
+        for(int i=0;i<BackendCommon.myPosts.Posts.size();i++)                           //Try to make it efficient
+        {
+            for(int j=0;j<BackendCommon.postsManager.Posts.size();j++) {
+                if (BackendCommon.postsManager.Posts.get(j).Key.equals(BackendCommon.myPosts.Posts.get(i).Key)) {
+                    PostInfo pinfo = BackendCommon.myPosts.Posts.get(i);
+                    BackendCommon.postsManager.Posts.set(j,pinfo);
+                }
+            }
         }
+        if(BackendCommon.postsManager.adapter!=null)BackendCommon.postsManager.adapter.notifyDataSetChanged();
+        if(BackendCommon.myPosts.adapter!=null)BackendCommon.myPosts.adapter.notifyDataSetChanged();
+        retriving=0;
 //        this.UpVote(Posts.get(0));
     }
+    int retriving=0;
     public boolean RetrieveNPost(int n)
     {
+        if(retriving==1)return false;
+        retriving=1;
         if(PostKey == null)
                 return false;
         PostToRead=n;
@@ -124,8 +134,8 @@ public class PostsManager extends DatabaseManager{
         Post.child("Head").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                Out("head:"+snapshot.getValue(String.class));
                 PostKey=snapshot.getValue(String.class);
+                RetrieveNPost(5);
             }
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -142,8 +152,6 @@ public class PostsManager extends DatabaseManager{
             return false;
         }
         Posts.add(pinfo);
-//        adapter
-//        adapter.notifyItemChanged(Posts.size()-1);
         if(--PostToRead>0)
         {
             GetNextPost();
@@ -156,7 +164,6 @@ public class PostsManager extends DatabaseManager{
         if(PostKey==null)
         {
             OnPostRead(null);
-//            Toast.makeText(context, "Reach End"+BackendCommon.postsManager.PostKey, Toast.LENGTH_SHORT).show();
             return false; ///there is no further post to read
         }
         Post.child(PostKey).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -166,11 +173,9 @@ public class PostsManager extends DatabaseManager{
                 if(!snapshot.exists())OnPostRead(null);
                 pinfo.Info=snapshot.child("Info").getValue(String.class);
                 pinfo.Key=PostKey;
-//                pinfo.commentManager=new CommentManager(PostKey);
-                PostKey=snapshot.child("Next").getValue(String.class);
                 pinfo.UserId=snapshot.child("User").getValue(String.class);
-                pinfo.DownVote=snapshot.child("DownVote").getValue(long.class);
-                pinfo.UpVote=snapshot.child("UpVote").getValue(long.class);
+                pinfo.DownVote=snapshot.child("Vote").child("DownVote").getValue(long.class);
+                pinfo.UpVote=snapshot.child("Vote").child("UpVote").getValue(long.class);
                 pinfo.VoteType=0;
                 Vote.child(pinfo.Key).child(UserId).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
@@ -185,6 +190,8 @@ public class PostsManager extends DatabaseManager{
                             }
                         });
 
+                PostKey=snapshot.child("Next").getValue(String.class);
+
             }
 
             @Override
@@ -192,6 +199,7 @@ public class PostsManager extends DatabaseManager{
 
             }
         });
+
         return true; //means atleast one post is there to read
     }
 
@@ -224,8 +232,8 @@ public class PostsManager extends DatabaseManager{
                 String HeadKey=snapshot.getValue(String.class);
                 Post.child(key).child("User").setValue(UserId);
                 Post.child(key).child("Info").setValue(info);
-                Post.child(key).child("UpVote").setValue((long)(0));
-                Post.child(key).child("DownVote").setValue((long)(0));
+                Post.child(key).child("Vote").child("UpVote").setValue((long)(0));
+                Post.child(key).child("Vote").child("DownVote").setValue((long)(0));
                 Post.child(key).child("Report").setValue((long)(0));
                 if(HeadKey!=null)
                 {
@@ -241,25 +249,48 @@ public class PostsManager extends DatabaseManager{
             }
         });
     }
-    public void DeletePost(String PostId)
+    public void DeleteActivityPostRef(PostInfo pinfo)
     {
-        Post.child(PostId).addListenerForSingleValueEvent(new ValueEventListener() {
+        MyActivity.child(pinfo.UserId).child("Post").child(pinfo.Key).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(!snapshot.exists() )return ; //if already deleted
+                String Prev=snapshot.child("Prev").getValue(String.class);
+                String Next=snapshot.child("Next").getValue(String.class);
+                if(Prev!=null)
+                    MyActivity.child(pinfo.UserId).child("Post").child(Prev).child("Next").setValue(Next);
+                else MyActivity.child(pinfo.UserId).child("Post").child("Head").setValue(Next);
+                if(Next!=null)
+                    MyActivity.child(pinfo.UserId).child("Post").child(Next).child("Prev").setValue(Prev);
+                MyActivity.child(pinfo.UserId).child("Post").child(pinfo.Key).removeValue();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+    public void DeletePost(PostInfo pinfo)
+    {
+        Post.child(pinfo.Key).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!snapshot.exists())return ; //if already deleted
                 String Prev=snapshot.child("Prev").getValue(String.class);
                 String Next=snapshot.child("Next").getValue(String.class);
                 String User=snapshot.child("User").getValue(String.class);
-                Post.child("Removed").setValue(PostId);
+                Post.child("Removed").setValue(pinfo.Key);
                 if(Prev!=null)
                     Post.child(Prev).child("Next").setValue(Next);
                 else Post.child("Head").setValue(Next);
                 if(Next!=null)
                     Post.child(Next).child("Prev").setValue(Prev);
-                DeleteActivityPostRef(PostId);
-                Post.child(PostId).removeValue();
-                Vote.child(PostId).removeValue();
-                Comment.child(PostId).removeValue();
+                DeleteActivityPostRef(pinfo);
+                Post.child(pinfo.Key).removeValue();
+                Vote.child(pinfo.Key).removeValue();
+                Comment.child(pinfo.Key).removeValue();
+                ReportCount.child("Post").child(pinfo.Key).removeValue();
             }
 
             @Override
@@ -268,17 +299,17 @@ public class PostsManager extends DatabaseManager{
             }
         });
     }
-    public void ReportPost(String PostId)
+    public void IncreaseReport(PostInfo pinfo)
     {
-        Post.child(PostId).child("Report").addListenerForSingleValueEvent(new ValueEventListener() {
+        Post.child(pinfo.Key).child("Report").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long report=snapshot.getValue(long.class);
-                if(report >= MaxReport)
+                if(report+1>=MaxReport)
                 {
-                    DeletePost(PostId);
+                    DeletePost(pinfo);
                 }
-                else Post.child(PostId).child("Report").setValue(report + 1);
+                else Post.child(pinfo.Key).child("Report").setValue(report+1);
             }
 
             @Override
@@ -287,44 +318,104 @@ public class PostsManager extends DatabaseManager{
             }
         });
     }
-    private String vote1,vote2;
-    private void OnVoteTypeRead(Object voteId,String PostId,long VoteType)
+    public void ReportPost(PostInfo pinfo)
     {
-        //reading Whole
-        Post.child(PostId).addListenerForSingleValueEvent(new ValueEventListener() {
+        ReportCount.child("Post").child(pinfo.Key).child(UserId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                long vote1count = snapshot.child(vote1).getValue(long.class);
-                long vote2count = snapshot.child(vote2).getValue(long.class);
-                if(voteId==null) {
-                    Post.child(PostId).child(vote1).setValue(vote1count+1);
-                    Vote.child(PostId).child(UserId).setValue(VoteType);
-                }
-                else if((long)voteId==VoteType)
+                if(snapshot.exists())return;    //so that same user cannot report again
+                else
                 {
-                    Post.child(PostId).child(vote1).setValue(vote1count-1);
-                    Vote.child(PostId).child(UserId).removeValue();
-                }
-                else if((long)voteId==-VoteType)
-                {
-                    Post.child(PostId).child(vote1).setValue(vote1count+1);
-                    Vote.child(PostId).child(UserId).setValue(VoteType);
-                    Post.child(PostId).child(vote2).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            Post.child(PostId).child(vote2).setValue(vote2count-1);
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
+                    IncreaseReport(pinfo);
+                    ReportCount.child("Post").child(pinfo.Key).child(UserId).setValue(true);
                 }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+    }
+
+    private String vote1,vote2;
+    void UpdateDetailsRef(PostInfo pinfo)
+    {
+        if(DetailsRef!=null)
+        {
+
+            DetailsRef.txtPost.setText(pinfo.Info);
+            DetailsRef.txtUp.setText(pinfo.UpVote+"");
+            DetailsRef.txtDown.setText(pinfo.DownVote+"");
+
+            if(pinfo.VoteType==0)
+            {
+                DetailsRef.txtUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_upward, 0, 0, 0);
+                DetailsRef.txtDown.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_downward, 0, 0, 0);
+            }
+            else if(pinfo.VoteType==1) {
+                DetailsRef.txtUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_upward_filled, 0, 0, 0);
+                DetailsRef.txtDown.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_downward, 0, 0, 0);
+            }else if (pinfo.VoteType==-1) {
+                DetailsRef.txtDown.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_downward_filled, 0, 0, 0);
+                DetailsRef.txtUp.setCompoundDrawablesWithIntrinsicBounds(R.drawable.arrow_upward, 0, 0, 0);
+            }
+        }
+    }
+    int working=0;
+    private void OnVoteTypeRead(PostInfo pinfo,String PostId,long VoteType)
+    {
+        if(working==1)return;
+
+        Post.child(PostId).child("Vote").runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                working=1;                              //to ensure that only one transaction at a time is called
+                if(currentData.getValue()==null)return Transaction.success(currentData);
+                long vote1count = currentData.child(vote1).getValue(long.class);
+                long vote2count = currentData.child(vote2).getValue(long.class);
+//                LastSelected=pinfo.
+                if(pinfo.VoteType==0) {
+                    currentData.child(vote1).setValue(1+vote1count);
+                }
+                else if(pinfo.VoteType==VoteType)
+                {
+                    currentData.child(vote1).setValue(vote1count-1);
+                }
+                else if(pinfo.VoteType==-VoteType)
+                {
+                    currentData.child(vote1).setValue(1+vote1count);
+                    currentData.child(vote2).setValue(vote2count-1);
+                }
+                return Transaction.success(currentData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                working=0;
+                if(committed==false)return;
+                if(pinfo.VoteType==1)pinfo.UpVote--;
+                else if(pinfo.VoteType==-1)pinfo.DownVote--;
+//                pinfo.UpVote=currentData.child("UpVote").getValue(long.class);
+//                pinfo.DownVote=currentData.child("DownVote").getValue(long.class);
+                if(pinfo.VoteType == VoteType)
+                {
+                    pinfo.VoteType=0;
+                    Vote.child(PostId).child(UserId).removeValue();
+                }
+                else
+                {
+                    if(VoteType==1)pinfo.UpVote++;
+                    else if(VoteType==-1)pinfo.DownVote++;
+                    pinfo.VoteType=VoteType;
+                    Vote.child(PostId).child(UserId).setValue(VoteType);
+
+                }
+                adapter.notifyDataSetChanged();
+                UpdateDetailsRef(pinfo);
+            }
         });
     }
 
@@ -340,40 +431,7 @@ public class PostsManager extends DatabaseManager{
             vote1="DownVote";
             vote2="UpVote";
         }
-        Vote. child(pinfo.Key).child(UserId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange (@NonNull DataSnapshot snapshot){
-                Object voteId=snapshot.getValue();
-                OnVoteTypeRead(voteId,pinfo.Key,VoteType);
-//                if(voteId==null || VoteType!=(long)voteId)pinfo.VoteType=VoteType;
-//                else pinfo.VoteType=0;
-//                OnCompletePostRead();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
-    }
-    public void DeleteActivityPostRef(String PostId)
-    {
-        MyActivity.child(UserId).child(PostId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(!snapshot.exists() )return ; //if already deleted
-                String Prev=snapshot.child("Prev").getValue(String.class);
-                String Next=snapshot.child("Next").getValue(String.class);
-                if(Prev!=null)
-                    MyActivity.child(UserId).child(Prev).child("Next").setValue(Next);
-                else MyActivity.child(UserId).child("Head").setValue(Next);
-                if(Next!=null)
-                    MyActivity.child(UserId).child(Next).child("Prev").setValue(Prev);
-                MyActivity.child(UserId).child(PostId).removeValue();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        OnVoteTypeRead(pinfo,pinfo.Key,VoteType);
     }
     public void DownVote(PostInfo pinfo)
     {

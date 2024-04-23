@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "264537809084",
+    "firebase_url": "https://wraith-coders-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "wraith-coders",
+    "storage_bucket": "wraith-coders.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:264537809084:android:443ea9484457d243f8f0b9",
+        "android_client_info": {
+          "package_name": "com.example.databasemanagement"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1w5DYoNO8vs0bF5i3DZxgLQhqMuBTKEc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:264537809084:android:4f7605b68c1b4e00f8f0b9",
+        "android_client_info": {
+          "package_name": "com.example.databasemanagement2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1w5DYoNO8vs0bF5i3DZxgLQhqMuBTKEc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:264537809084:android:7ed0321da09e8507f8f0b9",
+        "android_client_info": {
+          "package_name": "com.example.stealth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1w5DYoNO8vs0bF5i3DZxgLQhqMuBTKEc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

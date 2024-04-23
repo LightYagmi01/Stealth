@@ -39,14 +39,15 @@ public class SignIn extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-//        FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser() ;
-//        Toast.makeText(this, "" + currentUser.getUid(), Toast.LENGTH_SHORT);
 
         if(currentUser != null && currentUser.isEmailVerified()){
-            BackendCommon.UserId=currentUser.getUid();
-            BackendCommon.postsManager=new PostsManager(BackendCommon.UserId);
-            BackendCommon.pollManager=new PollManager(BackendCommon.UserId);
-            BackendCommon.myPosts=new MyPosts(BackendCommon.UserId);
+            if(BackendCommon.UserId==null) {
+                BackendCommon.UserId = currentUser.getUid();
+                BackendCommon.postsManager = new PostsManager(BackendCommon.UserId);
+                BackendCommon.pollManager = new PollManager(BackendCommon.UserId);
+                BackendCommon.myPosts = new MyPosts(BackendCommon.UserId);
+                BackendCommon.myPoll = new MyPoll(BackendCommon.UserId);
+            }
             Intent var = new Intent(SignIn.this, MainActivity.class);
             startActivity(var);
             finish();
@@ -120,6 +121,11 @@ public class SignIn extends AppCompatActivity {
                                         if (user.isEmailVerified()) {
                                             // Email is verified, proceed with your app logic
                                             // For example, navigate to the main activity
+                                            BackendCommon.UserId=user.getUid();
+                                            BackendCommon.postsManager=new PostsManager(BackendCommon.UserId);
+                                            BackendCommon.pollManager=new PollManager(BackendCommon.UserId);
+                                            BackendCommon.myPosts=new MyPosts(BackendCommon.UserId);
+                                            BackendCommon.myPoll=new MyPoll(BackendCommon.UserId);
                                             startActivity(new Intent(SignIn.this, MainActivity.class));
                                             finish();
                                         } else {

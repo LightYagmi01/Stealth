@@ -14,6 +14,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.appcompat.app.AppCompatDelegate;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 
 public class SplashScreen extends AppCompatActivity {
     VideoView videoView;
@@ -35,6 +38,17 @@ public class SplashScreen extends AppCompatActivity {
         videoView.setMediaController(null);
         videoView.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.stealthanimationblack));
         videoView.start();
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(currentUser != null && currentUser.isEmailVerified()) {
+            if (BackendCommon.UserId == null) {
+                BackendCommon.UserId = currentUser.getUid();
+                BackendCommon.postsManager = new PostsManager(BackendCommon.UserId);
+                BackendCommon.pollManager = new PollManager(BackendCommon.UserId);
+                BackendCommon.myPosts = new MyPosts(BackendCommon.UserId);
+                BackendCommon.myPoll = new MyPoll(BackendCommon.UserId);
+            }
+        }
         int time = 2500;//time in milliseconds
         new Handler().postDelayed(new Runnable() {
             @Override

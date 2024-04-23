@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MyPostFragment extends BackendCommon {
+public class MyPostFragment extends Fragment {
     TextView txtNoPost;
     public MyPostFragment() {
         // Required empty public constructor
@@ -28,9 +28,9 @@ public class MyPostFragment extends BackendCommon {
         recyclerView = rootView.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        RecyclerMyPostAdapter adapter = new RecyclerMyPostAdapter(getActivity(), myPosts.Posts);
+        RecyclerPostAdapter adapter = new RecyclerPostAdapter(getActivity(), BackendCommon.myPosts.Posts,BackendCommon.myPosts,RecyclerPostAdapter.PersonalPost);
         recyclerView.setAdapter(adapter);
-        myPosts.adapter=adapter;
+        BackendCommon.myPosts.adapter=adapter;
         if (adapter.getItemCount() == 0) {
             txtNoPost.setVisibility(View.VISIBLE);
         } else {

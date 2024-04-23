@@ -21,9 +21,8 @@ public class UserManager extends DatabaseManager{
 
 
 
-    public UserManager(String Email, TextView textView1)
+    public UserManager(String Email)
     {
-        textView=textView1;
         RetrieveUserId(Email);
     }
     private void RetrieveUserId(String Email)

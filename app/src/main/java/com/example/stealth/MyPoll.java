@@ -66,9 +66,9 @@ public class MyPoll extends PollManager{
                 pinfo.Options = new ArrayList<>();
                 pinfo.Title = snapshot.child("Title").getValue(String.class);
                 pinfo.Key = PollKey;
-                PollKey = snapshot.child("Next").getValue(String.class);
+//                PollKey = snapshot.child("Next").getValue(String.class);
                 pinfo.UserId = snapshot.child("User").getValue(String.class);
-                PollVote.child(pinfo.Key).child(pinfo.UserId).addListenerForSingleValueEvent(new ValueEventListener() {
+                PollVote.child(pinfo.Key).child(BackendCommon.UserId).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         pinfo.Selected = snapshot.getValue(String.class);
@@ -82,7 +82,7 @@ public class MyPoll extends PollManager{
                 for (DataSnapshot child : snapshot.child("Option").getChildren()) {
                     pinfo.Options.add(new Pair<>(child.getKey(), child.getValue(Integer.class)));
                 }
-                MyActivity.child(UserId).child("Poll").child(PollKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                MyActivity.child(BackendCommon.UserId).child("Poll").child(PollKey).child("Next").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         PollKey=snapshot.getValue(String.class);

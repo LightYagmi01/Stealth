@@ -8,7 +8,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +28,7 @@ public class PollDetailsActivity extends AppCompatActivity {
     ImageView imgSend;
     EditText edtComment;
     PollInfo pollInfo;
+    int pollType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,7 +43,6 @@ public class PollDetailsActivity extends AppCompatActivity {
         MaterialToolbar topBar = findViewById(R.id.top_bar);
         topBar.setNavigationIcon(R.drawable.arrow_back);
         topBar.setTitle("Poll");
-        topBar.inflateMenu(R.menu.menu_popup);
         topBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,7 +69,8 @@ public class PollDetailsActivity extends AppCompatActivity {
             }
         });
         int position = getIntent().getIntExtra("position", -1);
-        pollInfo = BackendCommon.pollManager.Polls.get(position);
+        pollType=getIntent().getIntExtra("PollType",-1);
+        pollInfo =(pollType==RecyclerPollOptionsAdapter.GeneralPoll)?BackendCommon.pollManager.Polls.get(position):BackendCommon.myPoll.Polls.get(position);
         txtTitle = findViewById(R.id.txtTitle);
         txtTitle.setText(pollInfo.Title);
         ArrayList<Pair<String,Integer>> arrPolls = pollInfo.Options;
@@ -78,11 +78,10 @@ public class PollDetailsActivity extends AppCompatActivity {
         RecyclerView recyclerViewPoll, recyclerViewComment;
         recyclerViewPoll = findViewById(R.id.recyclerViewPoll);
         recyclerViewPoll.setLayoutManager(new LinearLayoutManager(this));
-        RecyclerPollOptionsAdapter adapterPoll = new RecyclerPollOptionsAdapter(this,arrPolls);
+        RecyclerPollOptionsAdapter adapterPoll = new RecyclerPollOptionsAdapter(this,arrPolls,position,pollType);
         recyclerViewPoll.setAdapter(adapterPoll);
-
         BackendCommon.commentManager = new CommentManager(pollInfo.Key, pollInfo.UserId);
-        Toast.makeText(this, pollInfo.Key+" "+pollInfo.UserId,Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, pollInfo.Key+" "+pollInfo.UserId,Toast.LENGTH_SHORT).show();
         recyclerViewComment = findViewById(R.id.recyclerViewComment);
         recyclerViewComment.setLayoutManager(new LinearLayoutManager(this));
         RecyclerCommentAdapter adapterComment = new RecyclerCommentAdapter(this, BackendCommon.commentManager.Comments );
@@ -97,7 +96,6 @@ public class PollDetailsActivity extends AppCompatActivity {
                 if(comment.isEmpty())
                     return;
                 BackendCommon.commentManager.MakeComment(comment);
-//                Toast.makeText(getCallingActivity(), "hi hello ",Toast.LENGTH_SHORT).show();
                 edtComment.setText("");
             }
         });

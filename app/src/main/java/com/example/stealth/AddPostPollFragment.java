@@ -25,11 +25,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.ArrayList;
 
 
-public class AddPostPollFragment extends BackendCommon {
+public class AddPostPollFragment extends Fragment {
     Button btnPost, btnPoll;
     EditText edtPost, edtOpt, edtTitle;
     TextView txtCreatePoll, txtAddOpt, txtPost;
     LinearLayout postLayout, pollLayout;
+
+    static ArrayList<String> AddOption;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -57,9 +59,9 @@ public class AddPostPollFragment extends BackendCommon {
                     edtPost.setError("Empty");
                     return;
                 }
-                postsManager.MakePost(post);
+                BackendCommon.postsManager.MakePost(post);
                 Fragment selectedFragment = new HomeFragment();
-                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                MainActivity.bottomNavigationView.setSelectedItemId(R.id.menuHome);
 
             }
         });
@@ -103,7 +105,13 @@ public class AddPostPollFragment extends BackendCommon {
             @Override
             public void onClick(View v) {
                 String title = edtTitle.getText().toString();
-
+                String opt = edtOpt.getText().toString();
+                if(opt.isEmpty() || (AddOption.size() == 5) ){
+                }
+                else {
+                    AddOption.add(opt);
+                    edtOpt.setText(null);
+                }
                 if(AddOption.size() < 2) {
                     edtOpt.setError("Add at least 2 options.");
                     return;
@@ -116,9 +124,9 @@ public class AddPostPollFragment extends BackendCommon {
                 pollInfo.Options=new ArrayList<>();
                 for(int i=0;i<AddOption.size();i++)
                     pollInfo.Options.add(new Pair<>(AddOption.get(i),0));
-                pollManager.MakePoll(pollInfo);
+                BackendCommon.pollManager.MakePoll(pollInfo);
                 Fragment selectedFragment = new PollsFragment();
-                getParentFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                MainActivity.bottomNavigationView.setSelectedItemId(R.id.menuPoll);
 
             }
         });
